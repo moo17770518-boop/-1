@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>키오스크 주문 연습</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef5ff;color:#172b4d;font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button{font:inherit;touch-action:manipulation}
+.app{max-width:1180px;margin:auto;padding:24px 18px 45px}
+h1{text-align:center;font-size:clamp(32px,4.4vw,52px);margin:5px 0 8px;font-weight:950;letter-spacing:-.04em}
+.subtitle{text-align:center;font-size:clamp(22px,3vw,31px);font-weight:850;margin:0 0 15px}
+.practice-note{max-width:850px;margin:0 auto 26px;background:#fff4c7;border:3px solid #f1bd35;border-radius:18px;padding:13px 18px;text-align:center;font-size:clamp(18px,2.3vw,24px);font-weight:900;color:#654500}
+.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:#fff;border:4px solid #d4e1f2;border-radius:24px;padding:18px 10px;min-width:0;text-align:center;box-shadow:0 5px 0 #d8e2ef}
+.emoji{font-size:clamp(70px,8vw,105px);line-height:1.05;display:block;margin-bottom:7px}
+.name{font-size:clamp(25px,3vw,34px);font-weight:950}
+.price{font-size:clamp(21px,2.5vw,28px);font-weight:850;color:#3b5879;margin:3px 0 13px}
+.add{width:100%;min-height:64px;border:0;border-radius:16px;background:#1265e8;color:#fff;font-size:clamp(23px,2.6vw,30px);font-weight:950;cursor:pointer}
+.add:active{transform:translateY(2px)}
+.cart{margin-top:26px;background:#fff;border:4px solid #cbdcf4;border-radius:25px;padding:20px}
+.cart h2,.screen h2{font-size:clamp(28px,3.5vw,40px);margin:0 0 15px;font-weight:950}
+.empty{text-align:center;background:#f3f6fa;border-radius:16px;padding:25px;font-size:clamp(20px,2.4vw,26px);font-weight:800;color:#607187}
+.cart-row{display:grid;grid-template-columns:minmax(160px,1.5fr) minmax(115px,.8fr) auto auto;gap:12px;align-items:center;border-top:2px solid #e3eaf3;padding:14px 3px}
+.cart-row:first-child{border-top:0}
+.item-title{font-size:clamp(21px,2.5vw,28px);font-weight:950}
+.item-money{font-size:clamp(18px,2.1vw,23px);font-weight:800}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button,.delete{min-width:50px;min-height:50px;border-radius:13px;font-weight:950;font-size:25px;cursor:pointer}
+.qty button{border:2px solid #a9c4eb;background:#eaf3ff;color:#174d8c}
+.qty strong{min-width:38px;text-align:center;font-size:25px}
+.delete{border:2px solid #efb3b3;background:#fff0f0;color:#a51e1e;padding:6px 12px;font-size:19px}
+.summary{display:flex;justify-content:flex-end;gap:25px;flex-wrap:wrap;margin-top:17px;padding-top:16px;border-top:3px solid #cbdcf4;font-size:clamp(22px,2.7vw,30px);font-weight:950}
+.summary strong{color:#1265e8}
+.check{display:block;width:min(100%,520px);min-height:72px;margin:22px auto 0;border:0;border-radius:18px;background:#1468e9;color:#fff;font-size:clamp(25px,3vw,33px);font-weight:950;cursor:pointer}
+.check:disabled{background:#d3dbe7;color:#7d899a;cursor:not-allowed}
+.screen{max-width:850px;margin:0 auto;background:#fff;border:4px solid #cbdcf4;border-radius:26px;padding:25px;text-align:center}
+[hidden]{display:none!important}
+.review-list{text-align:left;margin:20px 0;border-top:3px solid #dce5f0}
+.review-row{display:grid;grid-template-columns:1fr auto;gap:15px;border-bottom:2px solid #e1e8f0;padding:15px 4px}
+.review-name{font-size:clamp(22px,2.8vw,29px);font-weight:950}
+.review-detail{font-size:clamp(19px,2.3vw,24px);font-weight:800;color:#445d78}
+.review-sub{font-size:clamp(21px,2.5vw,27px);font-weight:950}
+.big-total{background:#eaf3ff;border-radius:18px;padding:17px;margin:18px 0;font-size:clamp(25px,3.2vw,34px);font-weight:950}
+.question{font-size:clamp(25px,3.3vw,36px);font-weight:950;margin:24px 0}
+.actions{display:flex;gap:13px}
+.actions button,.again{flex:1;min-height:68px;border-radius:17px;font-size:clamp(22px,2.7vw,30px);font-weight:950;cursor:pointer}
+.back{border:3px solid #a9c4eb;background:#eaf3ff;color:#174d8c}
+.order,.again{border:0;background:#1468e9;color:white}
+.done-icon{font-size:70px}
+.done-title{font-size:clamp(30px,4vw,43px)!important}
+.order-number{max-width:380px;margin:22px auto;background:#eaf3ff;border:4px dashed #2472df;border-radius:22px;padding:14px}
+.order-number span{display:block;font-size:23px;font-weight:900}
+.order-number strong{display:block;font-size:clamp(65px,10vw,90px);line-height:1.1;color:#1464db;letter-spacing:.06em}
+.pickup{font-size:clamp(23px,3vw,31px);font-weight:950;margin:23px 0}
+.again{width:min(100%,520px);padding:10px 18px}
+button:focus-visible{outline:5px solid #f59e0b;outline-offset:3px}
+@media(max-width:800px){.menu-grid{grid-template-columns:repeat(2,1fr)}.cart-row{grid-template-columns:1fr auto}.item-money{grid-column:1}.qty{grid-column:2;grid-row:1/3}.delete{grid-column:1/3;width:100%}}
+@media(max-width:440px){.app{padding:16px 10px 35px}.menu-grid{gap:9px}.card{padding:14px 7px;border-width:3px}.emoji{font-size:70px}.add{min-height:57px}.actions{flex-direction:column}.summary{justify-content:center;gap:12px}.screen{padding:20px 13px}}
+
+.pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+.pay-option{min-height:125px;border:4px solid #cbdcf4;border-radius:22px;background:#fff;color:#172b4d;font-weight:950;font-size:clamp(23px,3vw,31px);cursor:pointer;padding:14px}
+.pay-option .pay-icon{display:block;font-size:45px;margin-bottom:7px}
+.pay-option.selected{border-color:#1265e8;background:#eaf3ff;box-shadow:inset 0 0 0 2px #1265e8}
+.easy-box{background:#f5f8fc;border:3px solid #d5e0ee;border-radius:20px;padding:17px;margin:8px 0 20px}
+.easy-title{font-size:clamp(21px,2.7vw,28px);font-weight:950;margin:0 0 12px}
+.easy-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.easy-pay{min-height:75px;border:3px solid #c9d6e7;border-radius:16px;background:white;font-size:clamp(18px,2.3vw,24px);font-weight:950;cursor:pointer;padding:8px}
+.easy-pay.selected{border-color:#1265e8;background:#eaf3ff;color:#124d9d}
+.payment-selected{min-height:65px;background:#fff7d6;border:3px solid #f0c451;border-radius:17px;padding:13px;margin:18px 0;font-size:clamp(20px,2.5vw,27px);font-weight:950}
+.pay-next{width:100%;min-height:70px;border:0;border-radius:18px;background:#1468e9;color:white;font-size:clamp(23px,2.8vw,31px);font-weight:950;cursor:pointer}
+.pay-next:disabled{background:#d3dbe7;color:#7d899a;cursor:not-allowed}
+.done-payment{font-size:clamp(20px,2.5vw,27px);font-weight:900;background:#f3f6fa;border-radius:15px;padding:12px;margin:13px 0}
+@media(max-width:600px){.pay-options,.easy-options{grid-template-columns:1fr}.pay-option{min-height:90px}.pay-option .pay-icon{display:inline;margin-right:8px;font-size:34px}}
+
+</style>
+</head>
+<body>
+<main class="app">
+<section id="menuScreen">
+<h1>🍽️ 키오스크 주문 연습</h1>
+<p class="subtitle">먹고 싶은 메뉴를 골라요.</p>
+<div class="practice-note">⚠️ 연습용 화면이며 실제 주문과 결제는 되지 않아요.</div>
+
+<div class="menu-grid" id="menuGrid"></div>
+
+<section class="cart" aria-labelledby="cartTitle">
+<h2 id="cartTitle">🛒 장바구니</h2>
+<div id="cartItems"></div>
+<div class="summary">
+<span>총 수량 <strong id="totalQty">0개</strong></span>
+<span>합계 <strong id="totalPrice">0원</strong></span>
+</div>
+<button id="checkBtn" class="check" disabled>주문 확인</button>
+</section>
+</section>
+
+<section id="confirmScreen" hidden>
+<div class="screen">
+<h2>주문 확인</h2>
+<div class="practice-note">⚠️ 연습용 화면이며 실제 주문과 결제는 되지 않아요.</div>
+<div id="confirmList" class="review-list"></div>
+<div id="confirmTotal" class="big-total"></div>
+<p class="question">이 메뉴를 주문할까요?</p>
+<div class="actions">
+<button id="backBtn" class="back">↩ 다시 고르기</button>
+<button id="orderBtn" class="order">결제하기 →</button>
+</div>
+</div>
+</section>
+
+
+<section id="paymentScreen" hidden>
+<div class="screen">
+<h2>💳 결제 방법을 골라요</h2>
+<div class="practice-note">⚠️ 연습용 화면이며 실제 주문과 결제는 되지 않아요.</div>
+<div id="paymentTotal" class="big-total"></div>
+
+<div class="pay-options" role="group" aria-label="결제 방법">
+<button class="pay-option" data-pay="현금"><span class="pay-icon">💵</span>현금</button>
+<button class="pay-option" data-pay="카드"><span class="pay-icon">💳</span>카드</button>
+<button class="pay-option" data-pay="간편페이"><span class="pay-icon">📱</span>간편페이</button>
+</div>
+
+<div id="easyPayBox" class="easy-box" hidden>
+<p class="easy-title">간편페이를 골라요.</p>
+<div class="easy-options">
+<button class="easy-pay" data-easy="카카오페이">카카오페이</button>
+<button class="easy-pay" data-easy="삼성페이">삼성페이</button>
+<button class="easy-pay" data-easy="네이버페이">네이버페이</button>
+</div>
+</div>
+
+<div id="paymentSelected" class="payment-selected" aria-live="polite">결제 방법을 하나 골라 주세요. 👆</div>
+<div class="actions">
+<button id="paymentBackBtn" class="back">↩ 주문 확인으로</button>
+<button id="paymentDoneBtn" class="pay-next" disabled>결제 완료하기 ✓</button>
+</div>
+</div>
+</section>
+
+<section id="doneScreen" hidden>
+<div class="screen">
+<div class="done-icon">🎉</div>
+<h2 class="done-title">주문 연습을 마쳤어요!</h2>
+<div class="practice-note">⚠️ 연습용 화면이며 실제 주문과 결제는 되지 않아요.</div>
+<div id="doneList" class="review-list"></div>
+<div id="doneTotal" class="big-total"></div>
+<div id="donePayment" class="done-payment"></div>
+<div class="order-number"><span>연습용 주문번호</span><strong>001</strong></div>
+<p class="pickup">🔔 번호가 불리면 음식을 받아요.</p>
+<button id="againBtn" class="again">다시 연습하기</button>
+</div>
+</section>
+</main>
+
+<script>
+const menu=[
+ {id:"tteok",name:"떡볶이",price:4000,emoji:"🍲"},
+ {id:"sundae",name:"순대",price:3000,emoji:"🍽️"},
+ {id:"gimbap",name:"김밥",price:3500,emoji:"🍙"},
+ {id:"juice",name:"주스",price:2000,emoji:"🧃"}
+];
+const cart={};
+const money=n=>n.toLocaleString("ko-KR")+"원";
+const menuGrid=document.getElementById("menuGrid");
+const cartItems=document.getElementById("cartItems");
+const checkBtn=document.getElementById("checkBtn");
+
+menuGrid.innerHTML=menu.map(m=>`
+<article class="card">
+ <span class="emoji" aria-hidden="true">${m.emoji}</span>
+ <div class="name">${m.name}</div>
+ <div class="price">${money(m.price)}</div>
+ <button class="add" data-add="${m.id}" aria-label="${m.name} 장바구니에 담기">담기</button>
+</article>`).join("");
+
+function totals(){
+ let qty=0,total=0;
+ menu.forEach(m=>{const q=cart[m.id]||0;qty+=q;total+=q*m.price});
+ return {qty,total};
+}
+function renderCart(){
+ const chosen=menu.filter(m=>cart[m.id]>0);
+ if(!chosen.length){
+   cartItems.innerHTML='<div class="empty">장바구니가 비어 있어요.<br>먹고 싶은 메뉴를 담아 주세요. 👆</div>';
+ }else{
+   cartItems.innerHTML=chosen.map(m=>`
+   <div class="cart-row">
+    <div><div class="item-title">${m.emoji} ${m.name}</div><div class="item-money">${money(m.price)} × ${cart[m.id]} = <strong>${money(m.price*cart[m.id])}</strong></div></div>
+    <div class="item-money">메뉴별 금액<br><strong>${money(m.price*cart[m.id])}</strong></div>
+    <div class="qty" aria-label="${m.name} 수량">
+     <button data-minus="${m.id}" aria-label="${m.name} 수량 줄이기">−</button>
+     <strong>${cart[m.id]}</strong>
+     <button data-plus="${m.id}" aria-label="${m.name} 수량 늘리기">+</button>
+    </div>
+    <button class="delete" data-delete="${m.id}">삭제</button>
+   </div>`).join("");
+ }
+ const t=totals();
+ document.getElementById("totalQty").textContent=t.qty+"개";
+ document.getElementById("totalPrice").textContent=money(t.total);
+ checkBtn.disabled=t.qty===0;
+}
+function reviewHTML(){
+ return menu.filter(m=>cart[m.id]>0).map(m=>`
+ <div class="review-row">
+  <div><div class="review-name">${m.emoji} ${m.name}</div><div class="review-detail">${money(m.price)} × ${cart[m.id]}개</div></div>
+  <div class="review-sub">${money(m.price*cart[m.id])}</div>
+ </div>`).join("");
+}
+function fillReview(prefix){
+ const t=totals();
+ document.getElementById(prefix+"List").innerHTML=reviewHTML();
+ document.getElementById(prefix+"Total").innerHTML=`총 수량 ${t.qty}개<br>합계 <strong>${money(t.total)}</strong>`;
+}
+function show(id){
+ ["menuScreen","confirmScreen","paymentScreen","doneScreen"].forEach(x=>document.getElementById(x).hidden=x!==id);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.addEventListener("click",e=>{
+ const add=e.target.dataset.add, plus=e.target.dataset.plus, minus=e.target.dataset.minus, del=e.target.dataset.delete;
+ if(add){cart[add]=(cart[add]||0)+1;renderCart();}
+ if(plus){cart[plus]=(cart[plus]||0)+1;renderCart();}
+ if(minus){cart[minus]=Math.max(0,(cart[minus]||0)-1);if(!cart[minus])delete cart[minus];renderCart();}
+ if(del){delete cart[del];renderCart();}
+});
+checkBtn.addEventListener("click",()=>{if(totals().qty){fillReview("confirm");show("confirmScreen")}});
+document.getElementById("backBtn").addEventListener("click",()=>show("menuScreen"));
+let paymentMethod="";
+let easyPayMethod="";
+function updatePayment(){
+ document.querySelectorAll(".pay-option").forEach(b=>b.classList.toggle("selected",b.dataset.pay===paymentMethod));
+ document.querySelectorAll(".easy-pay").forEach(b=>b.classList.toggle("selected",b.dataset.easy===easyPayMethod));
+ const easyBox=document.getElementById("easyPayBox");
+ easyBox.hidden=paymentMethod!=="간편페이";
+ let ready=paymentMethod && (paymentMethod!=="간편페이" || easyPayMethod);
+ let label="결제 방법을 하나 골라 주세요. 👆";
+ if(paymentMethod==="현금") label="💵 현금을 선택했어요.";
+ if(paymentMethod==="카드") label="💳 카드를 선택했어요.";
+ if(paymentMethod==="간편페이" && !easyPayMethod) label="📱 사용할 간편페이를 골라 주세요.";
+ if(paymentMethod==="간편페이" && easyPayMethod) label="📱 "+easyPayMethod+"를 선택했어요.";
+ document.getElementById("paymentSelected").textContent=label;
+ document.getElementById("paymentDoneBtn").disabled=!ready;
+}
+document.getElementById("orderBtn").addEventListener("click",()=>{
+ const t=totals();
+ document.getElementById("paymentTotal").innerHTML=`결제할 금액 <strong>${money(t.total)}</strong>`;
+ paymentMethod=""; easyPayMethod=""; updatePayment(); show("paymentScreen");
+});
+document.querySelectorAll(".pay-option").forEach(b=>b.addEventListener("click",()=>{
+ paymentMethod=b.dataset.pay; easyPayMethod=""; updatePayment();
+}));
+document.querySelectorAll(".easy-pay").forEach(b=>b.addEventListener("click",()=>{
+ paymentMethod="간편페이"; easyPayMethod=b.dataset.easy; updatePayment();
+}));
+document.getElementById("paymentBackBtn").addEventListener("click",()=>show("confirmScreen"));
+document.getElementById("paymentDoneBtn").addEventListener("click",()=>{
+ if(!paymentMethod || (paymentMethod==="간편페이"&&!easyPayMethod)) return;
+ fillReview("done");
+ document.getElementById("donePayment").textContent="연습 결제 방법: "+(paymentMethod==="간편페이"?easyPayMethod:paymentMethod);
+ show("doneScreen");
+});
+document.getElementById("againBtn").addEventListener("click",()=>{
+ Object.keys(cart).forEach(k=>delete cart[k]);
+ paymentMethod=""; easyPayMethod="";
+ renderCart();
+ show("menuScreen");
+});
+renderCart();
+</script>
+</body>
+</html>
